@@ -1,0 +1,149 @@
+/**
+ *  Copyright (c) 2002 Andrew R. Miller, All rights reserved.
+ */
+package amiller.colormap;
+
+import java.awt.Color;
+import java.awt.Dialog;
+import java.awt.Dimension;
+import java.awt.Graphics;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.GridLayout;
+import java.awt.Insets;
+import java.awt.SystemColor;
+
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+import javax.swing.ButtonGroup;
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JColorChooser;
+import javax.swing.JComponent;
+import javax.swing.JDialog;
+import javax.swing.JPanel;
+import javax.swing.JRadioButton;
+
+import javax.swing.border.EtchedBorder;
+
+
+/**
+ *  A panel for editing a TwoColorBlend colormap.
+ */
+public class TwoColorBlendEditor
+    extends JPanel
+{
+    //
+    // Instance data.
+    //
+
+
+    //
+    // Constructors.
+    //
+
+    public TwoColorBlendEditor(TwoColorBlend cmap) {
+        super();
+
+        this.layoutComponents(cmap);
+    }
+
+    private void layoutComponents(TwoColorBlend cmap) {
+        this.setLayout(new GridBagLayout());
+        GridBagConstraints constraints = new GridBagConstraints();
+        constraints.fill = GridBagConstraints.HORIZONTAL;
+
+        constraints.gridy++;
+        this.add(layoutColorMap(cmap), constraints);
+
+        constraints.gridy++;
+        this.add(layoutButtons(), constraints);
+    }
+
+    private JComponent layoutColorMap(final TwoColorBlend cmap) {
+        JPanel panel = new JPanel();
+        panel.setBorder(new EtchedBorder(EtchedBorder.RAISED));
+        panel.setLayout(new GridBagLayout());
+        GridBagConstraints constraints = new GridBagConstraints();
+        constraints.insets = new Insets(4, 4, 4, 4);
+        constraints.ipadx = 4;
+
+        // start colour
+        JButton button = new JButton("...");
+        Insets margin = button.getMargin();
+        button.setMargin(new Insets(margin.top, 4, margin.bottom, 4));
+        button.setBackground(cmap.getColor1());
+        button.setForeground(cmap.getColor2());
+        button.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    JDialog dialog = new JDialog();
+                    dialog.setTitle("TwoColorBlend: Start Colour");
+                    dialog.getContentPane().add(new JColorChooser(cmap.getColor1()));
+                    dialog.pack();
+                    dialog.setEnabled(true);
+                    dialog.setVisible(true);
+                }
+            });
+        panel.add(button, constraints);
+
+        // colormap
+        panel.add(new ColorMapViewer(cmap), constraints);
+
+        // end colour
+
+        button = new JButton("...");
+        margin = button.getMargin();
+        button.setMargin(new Insets(margin.top, 4, margin.bottom, 4));
+        button.setBackground(cmap.getColor2());
+        button.setForeground(cmap.getColor1());
+        final Dialog owner = null;
+        button.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    JDialog dialog = new ColorChooserDialog(owner, "TwoColorBlend: End Colour", cmap.getColor2());
+                    dialog.setEnabled(true);
+                    dialog.setVisible(true);
+                }
+            });
+        panel.add(button, constraints);
+
+        return panel;
+    }
+
+    private JComponent layoutButtons() {
+        JPanel panel = new JPanel();
+        panel.add(new JButton("Apply"));
+        panel.add(new JButton("Cancel"));
+        return panel;
+    }
+
+
+    //
+    // Methods.
+    //
+
+
+    //
+    // Inner classes.
+    //
+
+    private class ColorDialog
+        extends JDialog
+    {
+        ColorDialog(Dialog owner, Color c, String title) {
+            super(owner, title, true);
+            this.getContentPane().add(new JColorChooser(c));
+            this.getContentPane().add(layoutButtons());
+            this.pack();
+        }
+
+        private JComponent layoutButtons() {
+            JPanel panel = new JPanel();
+            panel.add(new JButton("OK"));
+            panel.add(new JButton("Revert"));
+            panel.add(new JButton("Cancel"));
+            return panel;
+        }
+    }
+
+}

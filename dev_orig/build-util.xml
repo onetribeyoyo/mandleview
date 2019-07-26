@@ -1,0 +1,495 @@
+<!-- ======================================================================= -->
+<!--  Copyright (c) Andrew R. Miller, 2000-2004.  All rights reserved.       -->
+<!-- ======================================================================= -->
+<!--                                                                         -->
+<!--  Generic build file for all projects.  This file is included by all of  -->
+<!--  the component build.xml files.                                         -->
+<!--                                                                         -->
+<!-- ======================================================================= -->
+
+
+  <!-- =====================================================================   -->
+  <!--  Initialization targets:                                                -->
+
+  <target name="init"
+          depends="load-properties, set-property-defaults">
+  </target>
+
+  <target name="load-properties">
+
+    <!-- Start by making the OS environment variables available.             -->
+    <property environment="env" />
+
+    <!-- Let the user override values without editing this build file.       -->
+    <!-- Values of env.HOME and user.home can differ (especially in windows  -->
+    <!-- environments) so load both.                                         -->
+    <property file="${env.HOME}/build.user.properties" />
+    <property file="${user.home}/build.user.properties" />
+
+    <!-- Project properties sets things like name, version, etc.             -->
+    <!-- Project properties is also the place to over ride any of the values -->
+    <!-- set in "set-property-defaults".                                     -->
+    <property file="build.custom.properties" />
+
+  </target>
+
+  <target name="set-property-defaults">
+
+    <!-- Project name defaults... -->
+    <property name="name"        value="unnamed-project" />
+    <property name="name.short"  value="${name}" />          <!-- Should be the build-unit's directory name. -->
+    <property name="name.abbrev" value="${name.short}" />
+    <property name="version"     value="DEV" />
+
+    <!-- Source directory name defaults.  All files in these directories are under CM. -->
+    <property name="doc.dir"    value="docs" />    <!-- documentation source dir -->
+    <property name="html.dir"   value="html" />    <!-- static html resources -->
+    <property name="image.dir"  value="images" />  <!-- image resources (jpeg, png, ...) -->
+    <property name="jsp.dir"    value="jsp" />     <!-- JSP resources -->
+    <property name="lib.dir"    value="lib" />     <!-- required jar files, etc. -->
+    <property name="config.dir" value="config" />  <!-- deployment descriptors, etc. -->
+    <property name="src.dir"    value="src" />     <!-- source code files -->
+    <property name="web.dir"    value="web" />     <!-- source files for the web app -->
+
+    <!-- Test source dirs... -->
+    <property name="test.dir"       value="test" />
+    <property name="test.html.dir"  value="${test.dir}/html" />
+    <property name="test.image.dir" value="${test.dir}/images" />
+    <property name="test.jsp.dir"   value="${test.dir}/jsp" />
+    <property name="test.lib.dir"   value="${test.dir}/lib" />
+    <property name="test.src.dir"   value="${test.dir}/src" />
+
+    <!-- Target directories.  All files in these directories are generaged by the targets. -->
+    <property name="classes.dir"    value="classes" />          <!-- compile target dir -->
+    <property name="dist.dir"       value="distribution" />     <!-- target for distribution -->
+    <property name="javadoc.dir"    value="${dist.dir}/api" />  <!-- target for javadoc generation -->
+    <property name="properties.dir" value="${classes.dir}" />   <!-- target for property files -->
+
+    <!-- Deployment directories for j2ee applications. -->
+    <property name="war.deploy.dir" value="${env.JBOSS_HOME}/server/default/deploy" />
+
+    <!-- Test target dirs... -->
+    <property name="junitreport.dir"     value="${dist.dir}/junit" />
+    <property name="test.classes.dir"    value="${test.dir}/classes" />
+    <property name="test.javadoc.dir"    value="${dist.dir}/testapi" />
+    <property name="test.properties.dir" value="${test.classes.dir}" />
+
+    <!-- Linux publish dirs... -->
+    <property name="linux.dir" value="f:/fba/build_units" />
+
+    <!-- Archive file defaults... -->
+    <property name="jar.file"      value="${dist.dir}/lib/${name.abbrev}-${version}.jar" />
+    <property name="war.file"      value="${dist.dir}/${name.abbrev}.war" />
+    <property name="ear.file"      value="${dist.dir}/${name.abbrev}.ear" />
+    <property name="test.jar.file" value="${dist.dir}/testlib/${name.abbrev}-test-${version}.jar" />
+    <property name="test.war.file" value="${dist.dir}/${name.abbrev}-test-${version}.war" />
+    <property name="test.ear.file" value="${dist.dir}/${name.abbrev}-test-${version}.ear" />
+
+    <!-- Javadoc defaults... -->
+    <property name="javadoc.access"           value="protected" />
+    <property name="javadoc.author"           value="true" />
+    <property name="javadoc.copyright.holder" value="AMiller, Inc." />
+    <property name="javadoc.copyright.years"  value="2002-2004" />
+    <property name="javadoc.overview"         value="${src.dir}/overview.html" />
+    <property name="javadoc.package.names"    value="*" />
+    <property name="javadoc.splitindex"       value="true" />
+  <!--   <property name="javadoc.stylesheetfile"   value="javadoc.css" /> -->
+    <property name="javadoc.use"              value="true" />
+    <property name="javadoc.version"          value="true" />
+
+    <!-- Junit defaults -->
+    <property name="junit.fork" value="true" /> <!-- Whether or not to run each junit test in its own JVM -->
+
+    <!-- Compilation (javac) defaults... -->
+    <property name="javac.debug" value="on" />
+    <property name="javac.deprecation" value="off" />
+    <property name="javac.sourceversion" value="1.5" />
+
+    <mkdir dir="${image.dir}" />  <!-- Must exist before declaring the classpath. -->
+    <mkdir dir="${lib.dir}" />    <!-- Must exist before declaring the classpath. -->
+    <path id="compile.classpath">
+      <pathelement location="${lib.dir}" />
+      <fileset dir="${lib.dir}">
+        <include name="*.jar" />
+      </fileset>
+      &custom.classpath;
+    </path>
+    <property name="compile.classpath" refid="compile.classpath" />
+
+    <mkdir dir="${test.image.dir}" />  <!-- Must exist before declaring the classpath. -->
+    <path id="test.compile.classpath">
+      <pathelement location="${test.lib.dir}" />
+      <fileset dir="${test.lib.dir}">
+        <include name="*.jar" />
+      </fileset>
+      &custom.test.classpath;
+      <pathelement location="${jar.file}" />
+      <pathelement path="${compile.classpath}" />
+    </path>
+    <property name="test.compile.classpath" refid="test.compile.classpath" />
+
+    <!-- Runtime (java) defaults... -->
+    <property name="run.maxmemory" value="64m" />
+    <!-- <property name="run.jvmarg" value="-ea" /> -->
+    <property name="run.jvmarg" value="-Xrunhprof" />
+    <property name="run.fork" value="yes" />
+    <property name="run.args" value="" />
+
+    <mkdir dir="${dist.dir}" />      <!-- Must exist before declaring the classpath. -->
+    <mkdir dir="${dist.dir}/lib" />  <!-- Must exist before declaring the classpath. -->
+    <path id="run.classpath">
+      <pathelement location="${test.properties.dir}" />
+      <pathelement location="${properties.dir}" />
+      <pathelement location="${test.jar.file}" />
+      <pathelement path="${test.compile.classpath}" />
+      <pathelement path="${compile.classpath}" />
+    </path>
+    <property name="run.classpath" refid="run.classpath" />
+
+  </target>
+  <!-- end of set-property-defaults target -->
+
+  <!-- ======================================================================= -->
+
+  <target name="all"
+          depends="clean, compile, junit, doc"
+          description="clean, compile, junit, &amp; doc.">
+  </target>
+
+  <!-- ======================================================================= -->
+
+  <target name="clean"
+          depends="init"
+          description="Removes all compiled resources and generated doc.">
+    <delete includeEmptyDirs="true" >
+      <fileset dir="${classes.dir}" includes="**/*" />
+    </delete>
+    <delete includeEmptyDirs="true" >
+      <fileset dir="${test.classes.dir}" includes="**/*" />
+    </delete>
+    <delete dir="${dist.dir}" />
+  </target>
+
+  <target name="scrub">
+    <delete dir="**/*~" />
+  </target>
+  <target name="classclean">
+    <delete dir="**/*.class" />
+  </target>
+  <target name="cleanall"
+          depends="clean, scrub, classclean" />
+
+  <!-- ======================================================================= -->
+
+  <target name="compile"
+          depends="init"
+          description="Compiles the source.">
+
+    <mkdir dir="${classes.dir}" />
+    <javac
+        debug="${javac.debug}"
+        deprecation="${javac.deprecation}"
+        destdir="${classes.dir}"
+        excludes="${javac.excludes}"
+        source="${javac.sourceversion}"
+        includeantruntime="false"
+        includejavaruntime="false"
+        >
+      <src path="${src.dir}" />
+      <classpath>
+        <pathelement path="${compile.classpath}" />
+      </classpath>
+    </javac>
+
+    <copy todir="${classes.dir}" overwrite="false">
+      <fileset dir="${src.dir}">
+        <include name="**/*.cfg" />
+        <include name="**/*.dtd" />
+        <include name="**/*.properties" />
+        <include name="**/*.xml" />
+        <include name="**/*.xsd" />
+      </fileset>
+    </copy>
+
+    <mkdir dir="${dist.dir}" />
+    <mkdir dir="${dist.dir}/lib" />
+
+    <jar jarfile="${jar.file}" >
+      <fileset dir="${classes.dir}" />
+      <fileset dir="${image.dir}" />
+    </jar>
+
+    <!-- Now do the equivalent for the test code. -->
+    <mkdir dir="${test.classes.dir}" />
+    <javac
+        debug="${javac.debug}"
+        deprecation="${javac.deprecation}"
+        destdir="${test.classes.dir}"
+        excludes="${javac.excludes}"
+        source="${javac.sourceversion}"
+        includeantruntime="false"
+        includejavaruntime="false"
+        >
+      <src path="${test.src.dir}" />
+      <classpath>
+        <pathelement path="${test.compile.classpath}" />
+      </classpath>
+    </javac>
+
+    <copy todir="${test.classes.dir}" overwrite="true">
+      <fileset dir="${test.src.dir}">
+        <include name="**/*.cfg" />
+        <include name="**/*.dtd" />
+        <include name="**/*.properties" />
+        <include name="**/*.xml" />
+        <include name="**/*.xsd" />
+      </fileset>
+    </copy>
+
+    <mkdir dir="${dist.dir}/testlib" />
+
+    <jar jarfile="${test.jar.file}" >
+      <fileset dir="${test.classes.dir}" />
+      <fileset dir="${test.image.dir}" />
+    </jar>
+
+    <!-- Finish by copying the lib resources into the distribution directory. -->
+    <copy todir="${dist.dir}/lib">
+      <fileset dir="${lib.dir}">
+        <include name="**/*" />
+      </fileset>
+    </copy>
+
+    <!-- Echo the javac flags at the end of it all so they don't get lost in the. -->
+    <!-- scrolling output. -->
+    <echo message="javac flags:" />
+    <echo message="    debug:       ${javac.debug}" />
+    <echo message="    deprecation: ${javac.deprecation}" />
+
+  </target>
+
+  <!-- ======================================================================= -->
+
+  <target name="compilefiles"
+          depends="init"
+          description="Compiles source files specified by 'file#' properties.  usage: ant compilefiles -Dfile1=file ... [-Dfile9=file9]">
+    <mkdir dir="${classes.dir}" />
+    <javac
+        debug="${javac.debug}"
+        deprecation="${javac.deprecation}"
+        destdir="${classes.dir}"
+        excludes="${javac.excludes}"
+        source="${javac.sourceversion}"
+        includeantruntime="false"
+        includejavaruntime="false"
+        listfiles="yes"
+        >
+      <src path="${src.dir}" />
+      <include name="${file1}"/>
+      <include name="${file2}"/>
+      <include name="${file3}"/>
+      <include name="${file4}"/>
+      <include name="${file5}"/>
+      <include name="${file6}"/>
+      <include name="${file7}"/>
+      <include name="${file8}"/>
+      <include name="${file9}"/>
+      <classpath>
+        <pathelement path="${compile.classpath}" />
+      </classpath>
+    </javac>
+  </target>
+
+  <!-- ======================================================================= -->
+
+  <target name="doc"
+          depends="init"
+          description="Generates the javadoc for the source.">
+
+    <!-- Derive window dressings from the application name, version, etc. -->
+    <property name="javadoc.windowtitle" value="${name.short} v${version}" />
+    <property name="javadoc.header" value="&lt;strong&gt; ${javadoc.windowtitle} &lt;/strong&gt;" />
+    <property name="javadoc.doctitle" value="${name} &lt;br&gt; API Specification" />
+    <property name="javadoc.bottom" value="&lt;small&gt;Copyright &#169; ${javadoc.copyright.holder} ${javadoc.copyright.years}.  All Rights Reserved.&lt;/small&gt;" />
+
+    <mkdir dir="${javadoc.dir}" />
+    <javadoc
+        access="${javadoc.access}"
+        author="${javadoc.author}"
+        bottom="${javadoc.bottom}"
+        destdir="${javadoc.dir}"
+        doctitle="${javadoc.doctitle}"
+        header="${javadoc.header}"
+        maxmemory="256m"
+        overview="${javadoc.overview}"
+        packagenames="${javadoc.package.names}"
+        source="${javac.sourceversion}"
+        splitindex="${javadoc.splitindex}"
+        use="${javadoc.use}"
+        version="${javadoc.version}"
+        windowtitle="${javadoc.windowtitle}"
+        additionalparam="-breakiterator"
+        >
+  <!--       stylesheetfile="${javadoc.stylesheetfile}" -->
+
+      <sourcepath>
+        <pathelement path="${src.dir}" />
+      </sourcepath>
+
+      <classpath>
+        <pathelement path="${classes.dir}" />
+        <pathelement path="${compile.classpath}" />
+      </classpath>
+
+      <link href="file:///${env.JAVA_HOME}/docs/api/" />
+      <link href="file:///c:/app/servlet-api/" />
+
+      <!-- Include any component-specific customizations -->
+      <!-- For example, links to other Javadocs and package group definitions.  -->
+      &custom.javadoc;
+
+      <!-- Define a standard set of package groups.  -->
+
+    </javadoc>
+
+  </target>
+
+  <target name="testdoc"
+          depends="doc"
+          description="Generates the javadoc for the source and test source.">
+
+    <mkdir dir="${test.javadoc.dir}" />
+    <javadoc
+        access="${javadoc.access}"
+        author="${javadoc.author}"
+        bottom="${javadoc.bottom}"
+        destdir="${test.javadoc.dir}"
+        doctitle="${javadoc.doctitle}"
+        header="${javadoc.header}"
+        maxmemory="128m"
+        overview="${javadoc.overview}"
+        packagenames="${javadoc.package.names}"
+        source="${javac.sourceversion}"
+        splitindex="${javadoc.splitindex}"
+        use="${javadoc.use}"
+        version="${javadoc.version}"
+        windowtitle="${javadoc.windowtitle}"
+        additionalparam="-breakiterator"
+        >
+  <!--       stylesheetfile="${javadoc.stylesheetfile}" -->
+
+      <sourcepath>
+        <pathelement path="${test.src.dir}" />
+      </sourcepath>
+
+      <classpath>
+        <pathelement path="${test.classes.dir}" />
+        <pathelement path="${test.compile.classpath}" />
+      </classpath>
+
+      <link href="${javadoc.dir}" />
+      <link href="file:///${env.JAVA_HOME}/docs/api/" />
+
+      <!-- Include any component-specific customizations -->
+      <!-- For example, links to other Javadocs and package group definitions.  -->
+      &custom.javadoc;
+
+    </javadoc>
+
+  </target>
+
+  <!-- ======================================================================= -->
+
+  <target name="junit"
+          depends="compile"
+          description="Executes junit tests.">
+
+    <mkdir dir="${junitreport.dir}" />
+    <junit printsummary="withOutAndErr"
+           filtertrace="false"
+           haltonerror="false"
+           haltonfailure="false"
+           showoutput="false"
+           timeout="300000"
+           dir="${basedir}"
+           >
+      <classpath>
+        <pathelement path="${run.classpath}" />
+      </classpath>
+      <formatter type="xml" usefile="true" />
+      <batchtest fork="${junit.fork}"
+                 todir="${junitreport.dir}">
+        <fileset dir="${test.src.dir}">
+          <include name="**/*Test.java" />
+          <exclude name="**/Test.java" />
+          <exclude name="**/AllTests.java" />
+        </fileset>
+      </batchtest>
+    </junit>
+
+    <junitreport todir="${junitreport.dir}">
+      <fileset dir="${junitreport.dir}">
+        <include name="TEST-*.xml"/>
+      </fileset>
+      <report format="noframes" todir="${junitreport.dir}"/>
+      <report format="frames" todir="${junitreport.dir}"/>
+    </junitreport>
+    <echo message="Junit report in ${junitreport.dir}/index.html or ${junitreport.dir}/junit-noframes.html [no-frames]." />
+
+  </target>
+
+  <!-- ======================================================================= -->
+
+  <target name="printenv"
+          depends="init"
+          description="Initializes and prints all properties.">
+    <echoproperties />
+  </target>
+
+  <!-- ======================================================================= -->
+
+  <target name="run"
+          depends="compile"
+          description="Executes java on 'classname' property.  usage: ant run [-Dclassname=class] [-Drun.args=cmdLineArgs]">
+    <java
+        classname="${classname}"
+        fork="${run.fork}"
+        maxmemory="${run.maxmemory}"
+        >
+      <jvmarg value="${run.jvmarg}" />
+      <classpath>
+        <pathelement path="${run.classpath}" />
+      </classpath>
+      <arg line="${run.args}" />
+    </java>
+  </target>
+
+  <!-- ======================================================================= -->
+
+  <target name="war"
+          depends="compile"
+          >
+    <war destfile="${war.file}"
+         webxml="${web.dir}/WEB-INF/web.xml">
+      <webinf dir="${web.dir}/WEB-INF" />
+      <fileset dir="${web.dir}" />
+      <fileset dir="${dist.dir}" >
+        <include name="api/**/*" />
+      </fileset>
+      <lib dir="${lib.dir}" />
+      <classes dir="${classes.dir}" />
+    </war>
+  </target>
+
+  <target name="deploy"
+          depends="war">
+    <copy file="${war.file}" todir="${war.deploy.dir}" overwrite="true" />
+  </target>
+
+  <!-- ======================================================================= -->
+
+  <target name="main"
+          depends="compile"
+          description="Main target - runs 'compile' by default." />
+
+  <!-- ======================================================================= -->
