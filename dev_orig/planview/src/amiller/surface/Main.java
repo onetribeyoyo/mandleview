@@ -7,8 +7,6 @@ import amiller.planview.ComplexMouseInfoPanel;
 import amiller.planview.Planview;
 import amiller.planview.SurfaceViewer;
 
-import amiller.util.LogInitializer;
-
 import java.awt.BorderLayout;
 import java.awt.Point;
 
@@ -33,8 +31,6 @@ public class Main
      */
     public static void main(String[] args)
     {
-        (new LogInitializer("log")).doInit();
-
         //view.add(new SurfaceViewer(view, new SinXYSurface(), new PointsRenderer()));
 
         view.add(new SurfaceViewer

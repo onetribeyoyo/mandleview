@@ -35,8 +35,6 @@ import java.io.IOException;
 import javax.swing.JComponent;
 import javax.swing.OverlayLayout;
 
-import org.apache.log4j.Category;
-
 
 /**
  *  This class will plot objects in a cartesian plane by defining a mapping
@@ -79,9 +77,6 @@ public class Planview
     private static final String zoomoutImagePath = imageDir + "/zoomout32x32.gif";
     private static Cursor ZOOM_OUT_CURSOR = Cursor.getPredefinedCursor(Cursor.CROSSHAIR_CURSOR);
 
-    /** The Planview log. */
-    static Category log = Category.getInstance("PLANVIEW");
-
 
     //
     // Static methods.
@@ -94,7 +89,7 @@ public class Planview
             ZOOM_IN_CURSOR = Toolkit.getDefaultToolkit().createCustomCursor(image, new Point(6, 6), "Zoom In");
         }
         catch (IOException ex) {
-            log.warn("Error accessing cursor image: " + zoominImagePath);
+            System.out.println("Error accessing cursor image: " + zoominImagePath);
         }
 
         try {
@@ -103,7 +98,7 @@ public class Planview
             ZOOM_OUT_CURSOR = Toolkit.getDefaultToolkit().createCustomCursor(image, new Point(6, 6), "Zoom Out");
         }
         catch (IOException ex) {
-            log.error("Error accessing cursor image: " + zoomoutImagePath);
+            System.out.println("Error accessing cursor image: " + zoomoutImagePath);
         }
     }
 
@@ -218,10 +213,10 @@ public class Planview
         addComponentListener(new ComponentAdapter()
             {
                 public void componentShown(ComponentEvent e) {
-                    log.debug("componentShown(...)");
+                    System.out.println("componentShown(...)");
                 }
                 public void componentResized(ComponentEvent e) {
-                    log.debug("componentResized(...)");
+                    System.out.println("componentResized(...)");
 
                     String message = "    was (w,h)=(";
                     if (currentDimension == null) {
@@ -232,12 +227,12 @@ public class Planview
                     }
                     message += ")";
 
-                    log.debug(message);
+                    System.out.println(message);
                     currentDimension = new Dimension(getWidth(), getHeight());
 
-                    log.debug("    resized to (w,h)=("
-                              + currentDimension.getWidth() + ","
-                              + currentDimension.getHeight() + ")");
+                    System.out.println("    resized to (w,h)=("
+                                       + currentDimension.getWidth() + ","
+                                       + currentDimension.getHeight() + ")");
                 }
             });
     }
@@ -272,7 +267,7 @@ public class Planview
         }
         catch (NoninvertibleTransformException ex) {
             // This should never happen.
-            log.error(ex);
+            System.out.println(ex);
             return null;
         }
     }
@@ -338,7 +333,7 @@ public class Planview
             this.removeAxisViewer();
         }
 
-        log.info("Adding AxisViewer");
+        System.out.println("Adding AxisViewer");
         this.axisViewer = new AxisViewer(this);
         this.add(this.axisViewer);
 
@@ -347,7 +342,7 @@ public class Planview
 
     public void removeAxisViewer() {
         if (this.axisViewer != null) {
-            log.info("Removing AxisViewer");
+            System.out.println("Removing AxisViewer");
             this.remove(this.axisViewer);
             this.axisViewer = null;
         }
@@ -358,7 +353,7 @@ public class Planview
             this.removeGridViewer();
         }
 
-        log.info("Adding GridViewer");
+        System.out.println("Adding GridViewer");
         this.gridViewer = new GridViewer(this);
         this.add(this.gridViewer);
 
@@ -367,7 +362,7 @@ public class Planview
 
     public void removeGridViewer() {
         if (this.gridViewer != null) {
-            log.info("Removing GridViewer");
+            System.out.println("Removing GridViewer");
             this.remove(this.gridViewer);
             this.gridViewer = null;
         }
@@ -378,7 +373,7 @@ public class Planview
             this.removeOriginViewer();
         }
 
-        log.info("Adding OriginViewer");
+        System.out.println("Adding OriginViewer");
         this.originViewer = new OriginViewer(this);
         this.add(this.originViewer);
 
@@ -387,7 +382,7 @@ public class Planview
 
     public void removeOriginViewer() {
         if (this.originViewer != null) {
-            log.info("Removing OriginViewer");
+            System.out.println("Removing OriginViewer");
             this.remove(this.originViewer);
             this.originViewer = null;
         }

@@ -87,7 +87,7 @@ public class InteruptableRenderer
             while (waiter == this) {
 
                 //try {
-                //    log.info(this.getName() + "...processing completed.");
+                //    System.out.println(this.getName() + "...processing completed.");
                 //}
                 //catch (InterruptedException e) { }
             }

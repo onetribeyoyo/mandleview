@@ -16,8 +16,6 @@ import java.awt.Point;
 
 import java.awt.geom.Point2D;
 
-import org.apache.log4j.Category;
-
 
 /**
  *  ???
@@ -77,11 +75,11 @@ public class PointsRenderer
 
 		long endTime = System.currentTimeMillis();
 
-		log.info("PointsRenderingAlgorithm.render(...) in " + (endTime - startTime)/1000.0 + " seconds.");
+		System.out.println("PointsRenderingAlgorithm.render(...) in " + (endTime - startTime)/1000.0 + " seconds.");
 	}
 
 	public void renderPoint(Graphics g, int viewX, int viewY, double fXY) {
-		log.debug("f(" + viewX + ", " + viewY + ") = " + fXY);
+		System.out.println("f(" + viewX + ", " + viewY + ") = " + fXY);
 
         g.setColor((Color) this.colors[(int)fXY - 1]);
 		g.fillRect(viewX, viewY, 1, 1);

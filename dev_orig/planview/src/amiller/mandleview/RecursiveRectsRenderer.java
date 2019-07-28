@@ -104,88 +104,71 @@ public class RecursiveRectsRenderer
 
         long endTime = System.currentTimeMillis();
 
-        log.info("RecursiveRects render(...) in "
-                 + (endTime - startTime)/1000.0 + " seconds.");
+        System.out.println("RecursiveRects render(...) in " + (endTime - startTime)/1000.0 + " seconds.");
     }
 
     /** The size (width and height) of the smallest rectangle that we should subdivide. */
     private static final int smallestRect = 7;
 
     /**
-     *  Utility method that paints a rectangular region of the mandlebrot
-     *  set using the rectangular method.  The region is defined by point
-     *  (<code>px</code>, <code>py</code>) and dimensions (<code>w</code>,
-     *  <code>h</code>).  It is assumed that the point region is not
+     *  Utility method that paints a rectangular region of the
+     *  mandlebrot set using the rectangular border tracing / edge
+     *  checking method.  The region is defined by point (px, py) and
+     *  dimensions (w, h).  It is assumed that the point region is not
      *  bisected by the Y axis.
      */
     public void renderRect(Planview view, Graphics g, int viewX, int viewY, int viewW, int viewH)
     {
-        log.debug("renderRect(..., x=" + viewX + ", y=" + viewY + ", w=" + viewW + ", h=" + viewH + ")");
+        //System.out.println("renderRect(..., x=" + viewX + ", y=" + viewY + ", w=" + viewW + ", h=" + viewH + ")");
 
-        // Don't bother with tiny rectangular.
-
+        // Don't bother trying to optimze tiny rectangles.
         if ((viewW < smallestRect) || (viewH < smallestRect)) {
             if (viewH < viewW) {
-                log.debug("renderHLine(..., x=" + viewX + ", y=" + viewY + ", w=" + (viewX + 1) + ")");
+                //System.out.println("renderHLine(..., x=" + viewX + ", y=" + viewY + ", w=" + (viewX + 1) + ")");
                 hRenderer.render(mset, view, g, new Point(viewX, viewY), new Dimension(viewW + 1, viewH));
             }
             else {
-                log.debug("renderVLine(..., x=" + viewX + ", y=" + viewY + ", h=" + (viewY + 1) + ")");
+                //System.out.println("renderVLine(..., x=" + viewX + ", y=" + viewY + ", h=" + (viewY + 1) + ")");
                 vRenderer.render(mset, view, g, new Point(viewX, viewY), new Dimension(viewW, viewH + 1));
             }
-            return;
+
+        } else {
+            // for larger rectangles...
+            // First, render the rect's border.
+
+            Color left     = renderVerticalLine(view, g, viewX,         viewY + 1,     viewH - 1);
+            Color right    = renderVerticalLine(view, g, viewX + viewW, viewY + 1,     viewH - 1);
+            Color top    = renderHorizontalLine(view, g, viewX,         viewY,         viewW + 1);
+            Color bottom = renderHorizontalLine(view, g, viewX,         viewY + viewH, viewW + 1);
+
+            // check for the special case for border tracing / edge checking...
+            if ((top != null) && (top == bottom) && (bottom == left) && (left == right)) {
+                // all edges are the same colour? therefore the interior is that colour too
+                g.setColor(top);
+                //g.fillRect(viewX + 1, viewY + 1, viewW - 1, viewH - 1);
+                g.fillRect(viewX, viewY, viewW, viewH);
+            }
+            else {
+                // Divide the rectangle, and recurse.
+
+                int halfWidth  = viewW / 2;
+                int halfHeight = viewH / 2;
+
+                // Top left.
+                renderRect(view, g, viewX + 1, viewY + 1, halfWidth, halfHeight);
+
+                // Top right.
+                renderRect(view, g, viewX + halfWidth + 2, viewY + 1, viewW - halfWidth - 3, halfHeight);
+
+                // Bottom left.
+                renderRect(view, g, viewX + 1, viewY + halfHeight + 2, halfWidth, viewH - halfHeight - 3);
+
+                // Bottom right.
+                renderRect(view, g,
+                           viewX + halfWidth + 2, viewY + halfHeight + 2,
+                           viewW - halfWidth - 3, viewH - halfHeight - 3);
+            }
         }
-
-        // First, render the rect's border.
-
-        Color left   = renderVerticalLine(view, g, viewX,         viewY + 1, viewH - 1);
-        Color right  = renderVerticalLine(view, g, viewX + viewW, viewY + 1, viewH - 1);
-
-        Color top    = renderHorizontalLine(view, g, viewX, viewY,         viewW + 1);
-        Color bottom = renderHorizontalLine(view, g, viewX, viewY + viewH, viewW + 1);
-
-        if ((null != top) && (top == bottom) && (bottom == left) && (left == right)) {
-            // Fill the entire rectangle.
-            g.setColor(top);
-            g.fillRect(viewX + 1, viewY + 1, viewW - 1, viewH - 1);
-        }
-        else {
-            // Divide the rectangle, and recurse.
-
-            int halfWidth  = viewW / 2;
-            int halfHeight = viewH / 2;
-
-            // Top left.
-            renderRect(view, g, viewX + 1, viewY + 1, halfWidth, halfHeight);
-
-            // Top right.
-            renderRect(view, g, viewX + halfWidth + 2, viewY + 1, viewW - halfWidth - 3, halfHeight);
-
-            // Bottom left.
-            renderRect(view, g, viewX + 1, viewY + halfHeight + 2, halfWidth, viewH - halfHeight - 3);
-
-            // Bottom right.
-            renderRect(view, g,
-                       viewX + halfWidth + 2, viewY + halfHeight + 2,
-                       viewW - halfWidth - 3, viewH - halfHeight - 3);
-        }
-
-        /*
-          int xMid = px + halfWidth;
-          int yMid = py + halfHeight;
-
-          // Top left.
-          paintRect(mSet, g, px + 1, py + 1, halfWidth, halfHeight);
-
-          // Top right.
-          paintRect(mSet, g, px + halfWidth + 2, py + 1, w - halfWidth - 3, halfHeight);
-
-          // Bottom left.
-          paintRect(mSet, g, px + 1, py + halfHeight + 2, halfWidth, h - halfHeight - 3);
-
-          // Bottom right.
-          paintRect(mSet, g, px + halfWidth + 2, py + halfHeight + 2, w - halfWidth - 3, h - halfHeight - 3);
-          }
-        */
     }
+
 }

@@ -13,8 +13,6 @@ import amiller.planview.Planview;
 import amiller.planview.SurfaceViewer;
 import amiller.planview.SurfaceViewer2;
 
-import amiller.util.LogInitializer;
-
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Point;
@@ -32,8 +30,6 @@ import javax.swing.SwingConstants;
 import javax.swing.border.BevelBorder;
 import javax.swing.border.SoftBevelBorder;
 
-import org.apache.log4j.Category;
-
 
 /**
  *  This is a test harness for <code>Surface</code>.
@@ -44,17 +40,12 @@ public class Main
     /** The SurfaceViewer itself, displayed in the center of the frame. */
     private static Planview view;
 
-	/** The mandleview log. */
-	static Category usage = Category.getInstance("USAGE");
-
 
     /**
      *  The test harness.
      */
     public static void main(String[] args)
     {
-        (new LogInitializer("log")).doInit();
-
         view = new Planview();
         MandlebrotSet mset = new MandlebrotSet(1);
         MandlebrotRenderer renderer = new RecursiveRectsRenderer(mset);
@@ -99,15 +90,15 @@ public class Main
     }
 
     public static void printUsage() {
-        usage.info("");
-        usage.info("Using the mouse to change the view:");
-        usage.info("  Pan:      <mouse-left> and drag.");
-        usage.info("");
-        usage.info("  Zoom in:  <ctrl>-<mouse-left> will zoom to a point.");
-        usage.info("            <ctrl>-<mouse-left> and drag to zoom to a region.");
-        usage.info("");
-        usage.info("  Zoom out: <shift>-<mouse-left> will zoom to a point.");
-        usage.info("            <shift>-<mouse-left> and drag to zoom to a region.");
-        usage.info("");
+        System.out.println("");
+        System.out.println("Using the mouse to change the view:");
+        System.out.println("  Pan:      <mouse-left> and drag.");
+        System.out.println("");
+        System.out.println("  Zoom in:  <ctrl>-<mouse-left> will zoom to a point.");
+        System.out.println("            <ctrl>-<mouse-left> and drag to zoom to a region.");
+        System.out.println("");
+        System.out.println("  Zoom out: <shift>-<mouse-left> will zoom to a point.");
+        System.out.println("            <shift>-<mouse-left> and drag to zoom to a region.");
+        System.out.println("");
     }
 }

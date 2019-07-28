@@ -3,8 +3,6 @@
  */
 package amiller.planview;
 
-import amiller.util.LogInitializer;
-
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Point;
@@ -30,8 +28,6 @@ public class Main
      */
     public static void main(String[] args)
     {
-        (new LogInitializer("log")).doInit();
-
         JFrame f = new JFrame();
 
         PropertyConfigurator.configure(view, "planview");

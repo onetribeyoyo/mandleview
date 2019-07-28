@@ -3,8 +3,6 @@
  */
 package amiller.colormap;
 
-import amiller.util.LogInitializer;
-
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Point;
@@ -29,8 +27,6 @@ public class Main
      */
     public static void main(String[] args)
     {
-        (new LogInitializer("log")).doInit();
-
         //cm = new TwoColorBlend(Color.white, Color.black);
         //cm = NaturalSpectrum.RED_ORANGE;
         //cm = NaturalSpectrum.ORANGE_YELLOW;

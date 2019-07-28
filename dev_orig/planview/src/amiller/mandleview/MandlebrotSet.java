@@ -7,8 +7,6 @@ package amiller.mandleview;
 
 import amiller.surface.SurfaceAdapter;
 
-import org.apache.log4j.Category;
-
 
 /**
  *  <class description>
@@ -26,9 +24,6 @@ public class MandlebrotSet
 
     /** The source revision. */
     public static final String REVISION = "$Revision: $";
-
-    /** The mandleview log. */
-    static Category log = Category.getInstance("MANDLEBROT_SET");
 
 
     //

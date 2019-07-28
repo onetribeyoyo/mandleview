@@ -19,8 +19,6 @@ import java.awt.geom.Point2D;
 import java.util.Iterator;
 import java.util.List;
 
-import org.apache.log4j.Category;
-
 
 /**
  *  This class renders a <code>Surface</code> onto a <code>Planview</code>
@@ -40,9 +38,6 @@ public abstract class MandlebrotRenderer
 
 	/** The source revision. */
 	public static final String REVISION = "$Revision: $";
-
-	/** The mandleview log. */
-	static Category log = Category.getInstance("MANDLEBROT_RENDER");
 
 	//
 	// Static methods.
