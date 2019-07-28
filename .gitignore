@@ -1,6 +1,9 @@
 # Compiled class file
 *.class
 
+planview/classes
+planview/distribution
+
 # Log file
 *.log
 

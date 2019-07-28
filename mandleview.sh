@@ -1,10 +1,10 @@
 #!/bin/sh
 
-DEV_DIR=~/github/onetribeyoyo/mandleview/dev_orig
+DEV_DIR=.
 PROJECT_DIR=$DEV_DIR/planview
 LIB_DIR=$PROJECT_DIR/distribution/lib
 JAR=$LIB_DIR/planview-DEV.jar
-MAIN=amiller.colormap.Main
+MAIN=amiller.mandleview.Main
 
 #echo jar file: $JAR
 #echo class:    $MAIN
