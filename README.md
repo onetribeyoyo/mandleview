@@ -7,7 +7,8 @@ Rediscovered some really old planview/mandleview code
 
 - depends on `brew install ant`
 - build it with `( cd planview ; ant clean ; ant compile )`
-- will need to create some missing directories to get ant tasks to work
+  - will need to create some missing directories to get ant tasks to work
+    - `( cd planview ; mkdir classes test/classes test/lib test/src )`
 - run it with one of
   - `mandleview.sh`
   - `colormap.sh`
