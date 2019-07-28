@@ -1,0 +1,105 @@
+/*
+ *  Copyright (c) 1997-2002 Andrew R. Miller, All rights reserved.
+ */
+package amiller.colormap;
+
+
+/**
+ *  This class represents a ParametricColorMap function (in one color)
+ *  with peak height, peak slope, horizontal position, and vertical offset.
+ */
+public final class ParametricFunction
+    extends Object
+{
+    //
+    // Private data.
+    //
+    private double peakHeight;
+    private double horizontalPosition;
+    private double peakSlope;
+    private double verticalOffset;
+
+
+    //
+    // Constructors.
+    //
+
+    /**
+     *  Default constructor.
+     */
+    public ParametricFunction(double peakHeight,
+                              double horizontalPosition,
+                              double peakSlope,
+                              double verticalOffset)
+    {
+        super();
+
+        this.peakHeight         = peakHeight;
+        this.horizontalPosition = horizontalPosition;
+        this.peakSlope          = peakSlope;
+        this.verticalOffset     = verticalOffset;
+    }
+
+
+    //
+    // Accessors.
+    //
+
+    public double getPeakHeight() {
+        return peakHeight;
+    }
+    public void setPeakHeight(double peakHeight) {
+        this.peakHeight = peakHeight;
+    }
+
+
+    public double getHorizontalPosition() {
+        return horizontalPosition;
+    }
+
+    public void setHorizontalPosition(double horizontalPosition) {
+        this.horizontalPosition = horizontalPosition;
+    }
+
+
+    public double getPeakSlope() {
+        return peakSlope;
+    }
+
+    public void setPeakSlope(double peakSlope) {
+        this.peakSlope = peakSlope;
+    }
+
+
+    public double getVerticalOffset() {
+        return verticalOffset;
+    }
+
+    public void setVerticalOffset(double verticalOffset) {
+        this.verticalOffset = verticalOffset;
+    }
+
+
+    //
+    // Methods.
+    //
+
+    /**
+     *  Computes the function value at x.
+     */
+    public double value(double x)
+    {
+        return
+            verticalOffset
+            + (peakHeight * Math.pow( 2.0, ((- peakSlope) * ((horizontalPosition - x) * (horizontalPosition - x)))));
+    }
+
+    public String toString()
+    {
+        return
+            "[h=" + this.peakHeight
+            + ", p=" + this.horizontalPosition
+            + ", s=" + this.peakSlope
+            + ", o=" + this.verticalOffset + "]";
+    }
+}
